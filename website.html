@@ -1,0 +1,2597 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gabriela Rubio | Web Developer & Computer Engineer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.150.0/examples/js/controls/OrbitControls.js"></script>
+
+    <style>
+              @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Inter:wght@300;400;500;700&display=swap');
+
+              * {
+                  margin: 0;
+                  padding: 0;
+                  box-sizing: border-box;
+
+              body {
+                  font-family: 'Inter', sans-serif;
+                  color: #fff;
+                  background-color: #070B14;
+                  overflow-x: hidden;
+              }
+
+              #canvas-container {
+                  position: fixed;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  z-index: -1;
+              }
+
+              /* Navbar styles */
+              .navbar {
+                  position: fixed;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  padding: 25px 40px;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  z-index: 100;
+                  background: rgba(7, 11, 20, 0.8);
+                  backdrop-filter: blur(10px);
+              }
+
+              .logo {
+                  font-family: 'Montserrat', sans-serif;
+                  font-size: 1.5rem;
+                  font-weight: 700;
+                  letter-spacing: 1px;
+                  color: #fff;
+                  text-decoration: none;
+              }
+
+              .nav-links {
+                  display: flex;
+                  gap: 30px;
+              }
+
+              .nav-link {
+                  font-family: 'Montserrat', sans-serif;
+                  font-size: 0.9rem;
+                  font-weight: 500;
+                  letter-spacing: 1px;
+                  color: #A3B5E6;
+                  text-decoration: none;
+                  transition: all 0.3s ease;
+                  position: relative;
+                  padding: 5px 0;
+              }
+
+              .nav-link:hover {
+                  color: #fff;
+              }
+
+              .nav-link::after {
+                  content: '';
+                  position: absolute;
+                  bottom: 0;
+                  left: 0;
+                  width: 0;
+                  height: 2px;
+                  background: #4A90E2;
+                  transition: width 0.3s ease;
+              }
+
+              .nav-link:hover::after {
+                  width: 100%;
+              }
+
+              .nav-link.active::after {
+                  width: 100%;
+              }
+
+              .nav-link.active {
+                  color: #fff;
+              }
+
+              /* Hero Section styles */
+              .hero-section {
+                  position: relative;
+                  z-index: 1;
+                  height: 100vh;
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: center;
+                  align-items: center;
+                  text-align: center;
+                  padding: 80px;
+              }
+
+              h1 {
+                  font-family: 'Montserrat', sans-serif;
+                  font-size: 4rem;
+                  margin-bottom: 1rem;
+                  font-weight: 700;
+                  letter-spacing: 2px;
+                  background: linear-gradient(to right, #E0E6FF, #FFFFFF);
+                  -webkit-background-clip: text;
+                  background-clip: text;
+                  -webkit-text-fill-color: transparent;
+                  opacity: 0;
+                  transform: translateY(30px);
+                  animation: fadeIn 1s ease-out forwards 0.5s;
+              }
+
+              h2 {
+                  font-family: 'Montserrat', sans-serif;
+                  font-size: 1.8rem;
+                  margin-bottom: 2rem;
+                  font-weight: 300;
+                  letter-spacing: 3px;
+                  color: #A3B5E6;
+                  opacity: 0;
+                  transform: translateY(20px);
+                  animation: fadeIn 1s ease-out forwards 1s;
+              }
+
+              .tagline {
+                  font-size: 1.1rem;
+                  max-width: 600px;
+                  margin-bottom: 2rem;
+                  line-height: 1.6;
+                  color: #8A9CCB;
+                  opacity: 0;
+                  animation: fadeIn 1s ease-out forwards 1.2s;
+              }
+
+              .nav-planets {
+                  display: flex;
+                  justify-content: center;
+                  gap: 3rem;
+                  margin-top: 2rem;
+                  opacity: 0;
+                  animation: fadeIn 1s ease-out forwards 1.5s;
+              }
+
+              .planet-container {
+                  position: relative;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  cursor: pointer;
+                  transition: all 0.4s ease;
+                  animation: floatPlanet 6s ease-in-out infinite;
+
+
+
+              }
+            @keyframes floatPlanet {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
+      }
+
+
+      /* Hover halo/pulse glow */
+      .planet::before {
+          content: '';
+          position: absolute;
+          width: 110%;
+          height: 110%;
+          border-radius: 50%;
+          box-shadow: 0 0 20px rgba(255,255,255,0.4);
+          animation: orbit-glow 3s ease-in-out infinite;
+          opacity: 0.4;
+          z-index: -1;
+      }
+
+      @keyframes orbit-glow {
+          0% { transform: scale(1); opacity: 0.4; }
+          50% { transform: scale(1.3); opacity: 0.7; }
+          100% { transform: scale(1); opacity: 0.4; }
+      }
+
+      /* Click flash feedback */
+      .planet.clicked {
+          animation: clickFlash 0.4s ease;
+      }
+
+      @keyframes clickFlash {
+          0% { transform: scale(1.1); }
+          50% { transform: scale(0.9); }
+          100% { transform: scale(1); }
+      }
+
+
+              .planet-container:hover .planet {
+                  transform: scale(1.15);
+                  box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+              }
+
+
+
+
+              .planet-container:hover .planet-label {
+                  opacity: 1;
+                  transform: translateY(0);
+              }
+
+              .planet {
+                  position: relative;
+                  width: 70px;
+                  height: 70px;
+                  background: radial-gradient(circle at 35% 35%, #fff, #888);
+                  border-radius: 50%;
+                  box-shadow:
+              inset -5px -5px 15px rgba(255, 255, 255, 0.4),
+              inset 5px 5px 15px rgba(0, 0, 0, 0.4),
+              0 0 15px rgba(255, 255, 255, 0.1);
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  transition: transform 0.4s ease, box-shadow 0.4s ease;
+                  background-size: 150% 150%;
+                   animation: rotatePlanet 10s linear infinite, pulse 3s ease-in-out infinite;
+              }
+
+              .planet::after {
+                  content: '';
+                  position: absolute;
+                  width: calc(100% + 10px);
+                  height: calc(100% + 10px);
+                  border-radius: 50%;
+                  border: 2px solid rgba(255, 255, 255, 0.2);
+                  animation: orbit 15s linear infinite;
+              }
+
+              .planet-label {
+                  margin-top: 15px;
+                  font-family: 'Montserrat', sans-serif;
+                  font-size: 0.9rem;
+                  font-weight: 500;
+                  letter-spacing: 1px;
+                  opacity: 0.7;
+                  transition: all 0.3s ease;
+                  transform: translateY(5px);
+              }
+
+              .planet:nth-child(1) {
+                  animation-delay: 0s;
+              }
+
+              .planet:nth-child(2) {
+                  animation-delay: 0.5s;
+              }
+
+              .planet:nth-child(3) {
+                  animation-delay: 1s;
+              }
+
+              .planet:nth-child(4) {
+                  animation-delay: 1.5s;
+              }
+
+              #about-planet {
+                  background: radial-gradient(circle at 30% 30%, #4A90E2, #1A237E);
+                  box-shadow: 0 0 15px rgba(74, 144, 226, 0.5);
+              }
+
+              #projects-planet {
+                  background: radial-gradient(circle at 30% 30%, #FFB74D, #E65100);
+                  box-shadow: 0 0 15px rgba(255, 183, 77, 0.5);
+              }
+
+              #research-planet {
+                 background: radial-gradient(circle at 30% 30%, #7E57C2, #4527A0);
+          box-shadow: 0 0 15px rgba(126, 87, 194, 0.5);
+              }
+
+              #contact-planet {
+                  background: radial-gradient(circle at 30% 30%, #CE93D8, #4A148C);
+                  box-shadow: 0 0 15px rgba(206, 147, 216, 0.5);
+              }
+
+              .scroll-indicator {
+                  position: absolute;
+                  bottom: 30px;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  opacity: 0;
+                  animation: fadeIn 1s ease-out forwards 2s, bounce 2s ease-in-out infinite 2s;
+              }
+
+              .scroll-indicator svg {
+                  width: 30px;
+                  height: 30px;
+                  fill: #fff;
+                  opacity: 0.7;
+              }
+
+              .cta-button {
+                  margin-top: 2.5rem;
+                  padding: 14px 36px;
+                  background: rgba(74, 144, 226, 0.1);
+                  border: 1px solid rgba(74, 144, 226, 0.5);
+                  color: #fff;
+                  font-family: 'Montserrat', sans-serif;
+                  font-size: 1rem;
+                  font-weight: 500;
+                  letter-spacing: 1px;
+                  cursor: pointer;
+                  border-radius: 30px;
+                  position: relative;
+                  overflow: hidden;
+                  transition: all 0.4s ease;
+                  opacity: 0;
+                  animation: fadeIn 1s ease-out forwards 2s;
+                  z-index: 5;
+              }
+
+              .cta-button:hover {
+                   background: rgba(74, 144, 226, 0.3);
+                  box-shadow: 0 0 25px rgba(74, 144, 226, 0.6);
+                  transform: translateY(-2px);
+              }
+
+              .cta-button::before {
+                  content: '';
+                  position: absolute;
+                  top: -50%;
+                  left: -50%;
+                  width: 200%;
+                  height: 200%;
+                  background: rgba(255, 255, 255, 0.1);
+                  transform: rotate(45deg);
+                  transition: all 0.5s ease;
+                  opacity: 0;
+              }
+
+              .cta-button:hover::before {
+                  opacity: 1;
+                  animation: glowing 1.5s linear infinite;
+              }
+
+              .hero-badge {
+                  position: absolute;
+                  top: 40px;
+                  left: 40px;
+                  padding: 8px 16px;
+                  background: rgba(0, 0, 0, 0.4);
+                  backdrop-filter: blur(5px);
+                  border-radius: 20px;
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                  display: flex;
+                  align-items: center;
+                  opacity: 0;
+                  animation: fadeIn 1s ease-out forwards 2.5s;
+                  z-index: 10;
+              }
+
+              .hero-badge span {
+                  font-family: 'Montserrat', sans-serif;
+                  font-size: 0.9rem;
+                  font-weight: 500;
+                  margin-left: 8px;
+              }
+
+              .hero-badge .status-dot {
+                  width: 10px;
+                  height: 10px;
+                  background-color: #4CAF50;
+                  border-radius: 50%;
+                  animation: pulse 2s infinite;
+              }
+
+              .social-links {
+                  position: absolute;
+                  bottom: 30px;
+                  right: 40px;
+                  display: flex;
+                  gap: 15px;
+                  opacity: 0;
+                  animation: fadeIn 1s ease-out forwards 2.5s;
+              }
+
+              .social-link {
+                  width: 40px;
+                  height: 40px;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  border-radius: 50%;
+                  background: rgba(0, 0, 0, 0.4);
+                  backdrop-filter: blur(5px);
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                  transition: all 0.3s ease;
+              }
+
+              .social-link:hover {
+                  transform: translateY(-3px);
+                  border-color: rgba(255, 255, 255, 0.3);
+                  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+              }
+
+              .social-link svg {
+                  width: 20px;
+                  height: 20px;
+                  fill: #fff;
+              }
+            /* About Section styles */
+      .about-section {
+          min-height: 100vh;
+          padding-top: 100px;
+          padding-bottom: 80px;
+          position: relative;
+      }
+
+      .about-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 20px;
+      }
+
+      .about-content {
+         display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+      }
+
+      .about-image {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+      }
+
+      .profile-orbit {
+          position: relative;
+          width: 280px;
+          height: 280px;
+          border-radius: 50%;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          animation: orbit 20s linear infinite;
+      }
+
+      .profile-orbit::before,
+      .profile-orbit::after {
+          content: '';
+          position: absolute;
+          border-radius: 50%;
+      }
+
+      .profile-orbit::before {
+          width: 320px;
+          height: 320px;
+          border: 1px dashed rgba(74, 144, 226, 0.3);
+      }
+
+      .profile-orbit::after {
+          width: 350px;
+          height: 350px;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .profile-photo {
+          width: 250px;
+          height: 250px;
+          background-color: #1E293B;
+          border-radius: 50%;
+          background-image: url('/api/placeholder/250/250');
+          background-size: cover;
+          background-position: center;
+          border: 3px solid rgba(74, 144, 226, 0.5);
+          box-shadow: 0 0 30px rgba(74, 144, 226, 0.3);
+      }
+
+      .about-text {
+          color: #A3B5E6;
+      }
+
+      .about-heading {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 2rem;
+          font-weight: 600;
+          margin-bottom: 20px;
+          color: #fff;
+      }
+
+      .about-description {
+          font-size: 1.05rem;
+          line-height: 1.7;
+          margin-bottom: 25px;
+      }
+
+      .interests-container {
+
+        text-align: center;
+        padding: 60px 20px;
+         margin-bottom: 80px; /* ⬅️ pushes the next section (e.g. Technical Skills) lower */
+      }
+
+      }
+
+      .interests-heading, .skills-heading {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: #fff;
+        font-size: 2rem;
+        margin-bottom: 40px;
+      }
+
+      .interests-grid {
+          display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 32px;
+        max-width: 1100px;
+        margin: 0 auto;
+        justify-content: center;
+      }
+
+      .interest-card {
+          background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 24px;
+        color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease;
+      }
+
+      .interest-card:hover {
+          transform: translateY(-5px);
+          background: rgba(0, 10, 30, 0.5);
+          border-color: rgba(74, 144, 226, 0.3);
+          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .interest-icon {
+          font-size: 2rem;
+        margin-bottom: 12px;
+      }
+
+      .interest-title {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 1.1rem;
+          font-weight: 600;
+          margin-bottom: 10px;
+          color: #fff;
+      }
+
+      .interest-desc {
+          font-size: 0.9rem;
+          line-height: 1.5;
+        color: #C5D1F7;
+      }
+
+      .astronomy-icon {
+          color: #4A90E2;
+      }
+
+      .photography-icon {
+          color: #FFB74D;
+      }
+
+      .music-icon {
+          color: #4DB6AC;
+      }
+
+      .code-icon {
+          color: #CE93D8;
+      }
+
+      .skills-container {
+        margin-top: 40px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          margin: 0 auto;
+          max-width: 1000px;
+      }
+
+      .skills-grid {
+          width: 100%;
+          justify-content: center;
+      }
+            .skill-category {
+          margin-bottom: 40px;
+
+
+      }
+
+      .skill-category-title {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 1.1rem;
+          font-weight: 600;
+          margin-bottom: 40px;
+          color: #fff;
+      }
+
+      .skill-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+      }
+
+      .skill-tag {
+          padding: 8px 15px;
+          background: rgba(74, 144, 226, 0.1);
+          border: 1px solid rgba(74, 144, 226, 0.3);
+          border-radius: 20px;
+          font-size: 0.9rem;
+          color: #A3B5E6;
+          display: inline-block;
+      }
+
+      /* Responsive styles for About section */
+      @media (max-width: 900px) {
+          .about-content {
+              grid-template-columns: 1fr;
+          }
+
+          .about-image {
+              order: -1;
+              margin-bottom: 30px;
+          }
+
+          .profile-orbit, .profile-orbit::before, .profile-orbit::after {
+              width: 90%;
+              height: auto;
+              aspect-ratio: 1/1;
+          }
+
+          .profile-photo {
+              width: 90%;
+              height: auto;
+              aspect-ratio: 1/1;
+          }
+      }
+
+      @media (max-width: 600px) {
+          .interests-grid, .skills-grid {
+              grid-template-columns: 1fr;
+          }
+      }
+
+              /* Projects Section styles */
+              .projects-section {
+                  padding-top: 100px;
+                  min-height: 100vh;
+              }
+
+              .section-header {
+                  text-align: center;
+                  padding: 60px 20px 40px;
+              }
+
+              .section-title {
+                  font-family: 'Montserrat', sans-serif;
+                  font-size: 2.5rem;
+                  font-weight: 700;
+                  letter-spacing: 2px;
+                  margin-bottom: 15px;
+                  background: linear-gradient(to right, #A3B5E6, #FFFFFF);
+                  -webkit-background-clip: text;
+                  background-clip: text;
+                  -webkit-text-fill-color: transparent;
+              }
+
+              .section-subtitle {
+                  font-size: 1.1rem;
+                  max-width: 700px;
+                  margin: 0 auto;
+                  line-height: 1.6;
+                  color: #8A9CCB;
+              }
+            .section-block {
+          padding-top: 120px;
+          padding-bottom: 80px;
+      }
+
+
+              .projects-container {
+                  max-width: 1200px;
+                  margin: 0 auto;
+                  padding: 0 20px;
+              }
+
+              .featured-project {
+                  margin-bottom: 80px;
+                  position: relative;
+                  overflow: hidden;
+                  border-radius: 10px;
+                  background: rgba(0, 10, 30, 0.5);
+                  backdrop-filter: blur(10px);
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+              }
+
+              .featured-project-content {
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 30px;
+                  padding: 40px;
+              }
+
+              .featured-project-info {
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: center;
+              }
+
+              .featured-project-label {
+                  font-family: 'Montserrat', sans-serif;
+                  font-size: 0.9rem;
+                  font-weight: 500;
+                  letter-spacing: 2px;
+                  color: #4A90E2;
+                  margin-bottom: 15px;
+              }
+
+              .featured-project-title {
+                  font-family: 'Montserrat', sans-serif;
+                  font-size: 2rem;
+                  font-weight: 700;
+                  margin-bottom: 20px;
+                  color: #fff;
+              }
+
+              .featured-project-description {
+                  font-size: 1rem;
+                  line-height: 1.7;
+                  color: #A3B5E6;
+                  margin-bottom: 25px;
+              }
+
+              .tech-list {
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 12px;
+                  margin-bottom: 25px;
+              }
+
+              .tech-tag {
+                  padding: 6px 12px;
+                  background: rgba(74, 144, 226, 0.1);
+                  border: 1px solid rgba(74, 144, 226, 0.3);
+                  border-radius: 20px;
+                  font-size: 0.8rem;
+                  font-weight: 500;
+                  color: #A3B5E6;
+              }
+
+              .project-links {
+                  display: flex;
+                  gap: 20px;
+                  margin-top: 10px;
+              }
+
+              .project-link {
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  color: #fff;
+                  text-decoration: none;
+                  font-size: 0.9rem;
+                  font-weight: 500;
+                  transition: all 0.3s ease;
+              }
+
+              .project-link:hover {
+                  color: #4A90E2;
+              }
+
+              .project-link svg {
+                  width: 18px;
+                  height: 18px;
+                  fill: currentColor;
+              }
+
+
+              .featured-project-visual {
+                  position: relative;
+                  height: 350px;
+                  border-radius: 8px;
+                  overflow: hidden;
+              }
+
+              #solar-system-demo {
+                  width: 100%;
+                  height: 100%;
+                  border-radius: 8px;
+                  background: #000;
+                  position: relative;
+              }
+
+              .project-grid {
+                  display: grid;
+                  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                  gap: 30px;
+                  margin-top: 60px;
+              }
+
+              .project-card {
+                  background: rgba(0, 10, 30, 0.5);
+                  backdrop-filter: blur(10px);
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                  border-radius: 10px;
+                  overflow: hidden;
+                  transition: all 0.3s ease;
+              }
+
+              .project-card:hover {
+                  transform: translateY(-10px);
+                  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+                  border-color: rgba(74, 144, 226, 0.3);
+              }
+
+              .project-image {
+                  height: 200px;
+                  width: 100%;
+                  background-size: cover;
+                  background-position: center;
+                  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+              }
+
+              .project-image.alien-game {
+                  background-image: url('/api/placeholder/400/320');
+                  background-color: #16213f;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  font-size: 2.5rem;
+                  color: #4AFFA7;
+              }
+
+              .project-image.meditation-app {
+                  background-image: url('/api/placeholder/400/320');
+                  background-color: #2C3E50;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  font-size: 2.5rem;
+                  color: #9B59B6;
+              }
+
+              .project-image.weather-app {
+                  background-image: url('/api/placeholder/400/320');
+                  background-color: #1A4B77;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  font-size: 2.5rem;
+                  color: #3498DB;
+              }
+
+              .project-image.imdb-explorer {
+                  background-image: url('/api/placeholder/400/320');
+                  background-color: #212121;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  font-size: 2.5rem;
+                  color: #F5C518;
+              }
+
+              .project-info {
+                  padding: 25px;
+              }
+
+              .project-title {
+                  font-family: 'Montserrat', sans-serif;
+                  font-size: 1.3rem;
+                  font-weight: 600;
+                  margin-bottom: 12px;
+                  color: #fff;
+              }
+
+              .project-description {
+                  font-size: 0.95rem;
+                  line-height: 1.6;
+                  color: #A3B5E6;
+                  margin-bottom: 20px;
+                  height: 80px;
+                  overflow: hidden;
+              }
+
+              .project-tech {
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 8px;
+                  margin-bottom: 20px;
+              }
+
+              .project-tech-tag {
+                  padding: 4px 10px;
+                  background: rgba(74, 144, 226, 0.1);
+                  border: 1px solid rgba(74, 144, 226, 0.3);
+                  border-radius: 20px;
+                  font-size: 0.75rem;
+                  color: #A3B5E6;
+              }
+
+              .view-project-btn {
+                  display: inline-block;
+                  padding: 8px 16px;
+                  background: rgba(74, 144, 226, 0.1);
+                  border: 1px solid rgba(74, 144, 226, 0.3);
+                  border-radius: 20px;
+                  font-size: 0.85rem;
+                  color: #fff;
+                  text-decoration: none;
+                  transition: all 0.3s ease;
+              }
+
+              .view-project-btn:hover {
+                  background: rgba(74, 144, 226, 0.2);
+                  transform: translateY(-2px);
+              }
+
+              /* Floating particles */
+              .particles {
+                  position: absolute;
+                  width: 100%;
+                  height: 100%;
+                  top: 0;
+                  left: 0;
+                  pointer-events: none;
+                  z-index: 0;
+              }
+
+              .particle {
+                  position: absolute;
+                  width: 3px;
+                  height: 3px;
+                  background: rgba(255, 255, 255, 0.5);
+                  border-radius: 50%;
+                  animation: float 15s linear infinite;
+              }
+
+              /* Animations */
+              @keyframes fadeIn {
+                  to {
+                      opacity: 1;
+                      transform: translateY(0);
+                  }
+              }
+
+              @keyframes orbit {
+                  from {
+                      transform: rotate(0deg);
+                  }
+                  to {
+                      transform: rotate(360deg);
+                  }
+              }
+
+              @keyframes pulse {
+                  0% {
+                      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+                      background-position: 0% 50%;
+                  }
+                  50% {
+                      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+                      background-position: 100% 50%;
+                  }
+                  100% {
+                      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+                      background-position: 0% 50%;
+                  }
+              }
+
+              @keyframes bounce {
+                  0%, 20%, 50%, 80%, 100% {
+                      transform: translateY(0) translateX(-50%);
+                  }
+                  40% {
+                      transform: translateY(-10px) translateX(-50%);
+                  }
+                  60% {
+                      transform: translateY(-5px) translateX(-50%);
+                  }
+              }
+
+              @keyframes glowing {
+                  0% {
+                      transform: translate(-50%, -50%) rotate(45deg);
+                  }
+                  100% {
+                      transform: translate(50%, 50%) rotate(45deg);
+                  }
+              }
+
+              @keyframes float {
+                  0% {
+                      transform: translateY(0) translateX(0);
+                  }
+                  50% {
+                      transform: translateY(-20px) translateX(10px);
+                  }
+                  100% {
+                      transform: translateY(0) translateX(0);
+                  }
+              }
+
+              /* Responsive styles */
+              @media (max-width: 900px) {
+                  .featured-project-content {
+                      grid-template-columns: 1fr;
+                  }
+
+                  .featured-project-visual {
+                      order: -1;
+                  }
+              }
+
+              @media (max-width: 768px) {
+                  .project-grid {
+                      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                  }
+
+                  .section-title {
+                      font-size: 2rem;
+                  }
+
+                  h1 {
+                      font-size: 3rem;
+                  }
+
+                  h2 {
+                      font-size: 1.5rem;
+                  }
+
+                  .nav-planets {
+                      gap: 1.5rem;
+                  }
+
+                  .planet {
+                      width: 60px;
+                      height: 60px;
+                  }
+              }
+            /* Contact Section styles */
+      .contact-section {
+          padding-top: 100px;
+          padding-bottom: 100px;
+          min-height: 100vh;
+          position: relative;
+      }
+
+      .contact-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 20px;
+      }
+
+      .contact-content {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 50px;
+          margin-top: 50px;
+      }
+
+      .contact-info {
+          color: #A3B5E6;
+      }
+
+      .contact-heading {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 2rem;
+          font-weight: 600;
+          margin-bottom: 20px;
+          color: #fff;
+      }
+
+      .contact-description {
+          font-size: 1.05rem;
+          line-height: 1.7;
+          margin-bottom: 30px;
+      }
+
+      .contact-details {
+          display: flex;
+          flex-direction: column;
+          gap: 25px;
+          margin-top: 40px;
+      }
+
+      .contact-method {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+      }
+
+      .contact-icon {
+          font-size: 2.2rem;
+          color: #4A90E2;
+          width: 50px;
+          height: 50px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: rgba(74, 144, 226, 0.1);
+          border-radius: 50%;
+          border: 1px solid rgba(74, 144, 226, 0.3);
+      }
+
+      .contact-text h3 {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 1.1rem;
+          font-weight: 600;
+          margin-bottom: 5px;
+          color: #fff;
+      }
+
+      .contact-text p {
+          font-size: 1rem;
+          color: #A3B5E6;
+      }
+
+      .contact-text a {
+          color: #A3B5E6;
+          text-decoration: none;
+          transition: color 0.3s ease;
+      }
+
+      .contact-text a:hover {
+          color: #4A90E2;
+      }
+
+      .contact-form-container {
+          background: rgba(0, 10, 30, 0.5);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 10px;
+          padding: 40px;
+      }
+
+      .form-heading {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 1.5rem;
+          font-weight: 600;
+          margin-bottom: 30px;
+          color: #fff;
+          text-align: center;
+      }
+
+      .contact-form {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+      }
+
+      .form-group {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+      }
+
+      .form-group label {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #A3B5E6;
+      }
+
+      .form-group input,
+      .form-group textarea {
+          padding: 12px 15px;
+          background: rgba(0, 0, 0, 0.3);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 5px;
+          color: #fff;
+          font-family: 'Inter', sans-serif;
+          font-size: 1rem;
+          transition: all 0.3s ease;
+      }
+
+      .form-group input:focus,
+      .form-group textarea:focus {
+          outline: none;
+          border-color: rgba(74, 144, 226, 0.5);
+          box-shadow: 0 0 10px rgba(74, 144, 226, 0.2);
+      }
+
+      .form-group input::placeholder,
+      .form-group textarea::placeholder {
+          color: rgba(255, 255, 255, 0.3);
+      }
+
+      .submit-btn {
+          margin-top: 10px;
+          padding: 14px;
+          background: rgba(74, 144, 226, 0.2);
+          border: 1px solid rgba(74, 144, 226, 0.5);
+          color: #fff;
+          font-family: 'Montserrat', sans-serif;
+          font-size: 1rem;
+          font-weight: 500;
+          letter-spacing: 1px;
+          cursor: pointer;
+          border-radius: 5px;
+          transition: all 0.4s ease;
+      }
+
+      .submit-btn:hover {
+          background: rgba(74, 144, 226, 0.4);
+          transform: translateY(-2px);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Responsive styles for Contact section */
+      @media (max-width: 900px) {
+          .contact-content {
+              grid-template-columns: 1fr;
+          }
+
+          .contact-form-container {
+              margin-top: 40px;
+          }
+      }
+
+      @media (max-width: 600px) {
+          .contact-method {
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 10px;
+          }
+
+          .contact-icon {
+              margin-bottom: 5px;
+          }
+      }
+            .animated-icon {
+          animation: softPulse 2.5s ease-in-out infinite;
+          display: inline-block;
+      }
+
+      @keyframes softPulse {
+          0% { transform: scale(1); opacity: 0.9; }
+          50% { transform: scale(1.15); opacity: 1; }
+          100% { transform: scale(1); opacity: 0.9; }
+      }
+            .animated-icon:hover {
+          animation: bounceHover 0.6s ease;
+      }
+
+      @keyframes bounceHover {
+          0%   { transform: scale(1); }
+          30%  { transform: scale(1.2) translateY(-6px); }
+          60%  { transform: scale(0.95) translateY(2px); }
+          100% { transform: scale(1) translateY(0); }
+      }
+
+
+      .film-icon {
+          color: #F5C518; /* IMDb gold */
+      }
+
+      .psych-icon {
+          color: #FF6F61; /* Coral for vibrance */
+      }
+            .favorites-list {
+          margin-top: 12px;
+          padding-left: 0;
+          font-size: 0.85rem;
+          color: #C5D1F7;
+            list-style: none;
+              text-align: left;
+        p
+      }
+
+
+      .switch {
+          position: relative;
+          display: inline-block;
+          width: 45px;
+          height: 24px;
+      }
+
+      .switch input {
+          opacity: 0;
+          width: 0;
+          height: 0;
+      }
+
+      .slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0; left: 0;
+          right: 0; bottom: 0;
+          background-color: #ccc;
+          transition: 0.4s;
+          border-radius: 24px;
+      }
+
+      .slider:before {
+          position: absolute;
+          content: "";
+          height: 18px; width: 18px;
+          left: 3px;
+          bottom: 3px;
+          background-color: white;
+          transition: 0.4s;
+          border-radius: 50%;
+      }
+
+      input:checked + .slider {
+          background-color: #4CAF50;
+      }
+
+      input:checked + .slider:before {
+          transform: translateX(21px);
+      }
+            #loading-screen {
+          position: fixed;
+          width: 100%;
+          height: 100%;
+          background: radial-gradient(circle at center, #0a0f1f 30%, #000 100%);
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          z-index: 9999;
+          color: #A3B5E6;
+          font-family: 'Montserrat', sans-serif;
+          font-size: 1.2rem;
+          animation: fadeOut 1s ease-out 2.5s forwards;
+      }
+
+      .planet-loader {
+          font-size: 3rem;
+          animation: orbitSpin 2s linear infinite;
+      }
+
+      @keyframes orbitSpin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+      }
+
+      @keyframes fadeOut {
+          to {
+              opacity: 0;
+              visibility: hidden;
+          }
+      }
+            .availability-badge {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          padding: 10px 18px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          font-family: 'Montserrat', sans-serif;
+          border-radius: 30px;
+          z-index: 999;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Green - Available */
+      .availability-badge:not(.available) {
+          background-color: #1E293B;
+          /*color: #A3F7BF; */
+          color: #d1151e;
+          /*border: 1px solid #4CAF50; */
+          border: 1px solid #e32029
+      }
+      .resume-section {
+        padding: 100px 20px;
+        background: rgba(255, 255, 255, 0.02);
+        text-align: center;
+      }
+
+      .timeline {
+        position: relative;
+        max-width: 800px;
+        margin: 60px auto 40px;
+        padding-left: 20px;
+        border-left: 2px solid #4A90E2;
+      }
+
+      .timeline-item {
+        position: relative;
+        margin-bottom: 50px;
+        opacity: 0;
+        transform: translateY(20px);
+          transition: all 0.6s ease;
+      }
+            .timeline-item.visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+      .timeline-item:nth-child(1) { animation-delay: 0.2s; }
+      .timeline-item:nth-child(2) { animation-delay: 0.4s; }
+      .timeline-item:nth-child(3) { animation-delay: 0.6s; }
+
+      .timeline-dot {
+        position: absolute;
+          left: -20px;
+          top: 0;
+          font-size: 1.2rem;
+          background: #070B14;
+          padding: 6px;
+          border-radius: 50%;
+          color: #77c9ff;
+          border: 2px solid #fff;
+      }
+
+      .timeline-content h3 {
+        color: #fff;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+      }
+
+      .timeline-content p {
+        color: #A3B5E6;
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      /* Animation */
+      @keyframes fadeInUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Download Button */
+      .resume-download {
+        margin-top: 30px;
+      }
+
+      .download-btn {
+        display: inline-block;
+        padding: 14px 32px;
+        background: rgba(74, 144, 226, 0.15);
+        border: 1px solid rgba(74, 144, 226, 0.6);
+        color: #fff;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+        letter-spacing: 1px;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .download-btn:hover {
+        background: rgba(74, 144, 226, 0.3);
+        box-shadow: 0 0 20px rgba(74, 144, 226, 0.5);
+        transform: translateY(-2px);
+      }
+
+      .download-btn::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -75%;
+        width: 50%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        transform: skewX(-20deg);
+        transition: left 0.5s ease;
+      }
+
+      .download-btn:hover::before {
+        left: 120%;
+      }
+
+            .project-image img {
+         width: 100%;
+         height: 100%;
+         object-fit: cover; /* Covers the entire area, may crop image */
+         /* Alternative: object-fit: contain; - Fits entire image within container */
+      }
+        #soundscape-section {
+        z-index: 999;
+      }
+      
+
+    
+    
+    
+    .soundscape-container {
+     display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 100;
+    }
+    
+    #soundscape-canvas {
+      width: 100%;
+      height: 100%;
+        display: block;
+    }
+    
+    .exit-button {
+      position: absolute;
+  bottom: 80px;  /* Changed from top to bottom */
+  right: 20px;
+  z-index: 1000;
+  background: linear-gradient(135deg, rgba(59, 65, 124, 0.7), rgba(46, 49, 90, 0.8));
+  color: #e0e7ff;
+  border: 1px solid rgba(120, 140, 255, 0.5);
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: 'Arial', sans-serif;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 0 15px rgba(88, 103, 221, 0.3), 0 0 30px rgba(58, 70, 180, 0.1);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  text-shadow: 0 0 5px rgba(120, 140, 255, 0.5);
+  letter-spacing: 0.5px;
+        
+    }
+       .exit-button:hover {
+        background: linear-gradient(135deg, rgba(72, 80, 150, 0.8), rgba(55, 60, 120, 0.9));
+  border-color: rgba(140, 160, 255, 0.8);
+  box-shadow: 0 0 20px rgba(88, 103, 221, 0.5), 0 0 40px rgba(58, 70, 180, 0.2);
+  transform: translateY(-2px);
+         
+    }
+    .exit-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 10px rgba(88, 103, 221, 0.4);
+}
+    
+    .exit-icon {
+      margin-right: 8px;
+  font-size: 20px;
+  font-weight: bold;
+    }
+    
+    .planet-info-panel {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      max-width: 300px;
+      z-index: 101;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+    
+    #loading-overlay {
+     position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+      color: white;
+      font-size: 18px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    
+    .spinner {
+     border: 5px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 5px solid #3f51b5;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+ </style>
+  </head>
+
+  <body>
+    <div id="loading-screen">
+      <div class="stars"></div>
+      <div class="planet-loader">🪐</div>
+      <p>Launching the universe...</p>
+    </div>
+
+    <div id="canvas-container"></div>
+    <div class="particles" id="particles"></div>
+
+    <nav class="navbar">
+      <a href="#" class="logo">GR</a>
+      <div class="nav-links">
+        <a href="#home" class="nav-link active">Home</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#resume" class="nav-link">Resume</a>
+        <a href="#projects" class="nav-link">Projects</a>
+
+        <a href="#contact" class="nav-link">Contact</a>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+      <h1>GABRIELA RUBIO</h1>
+      <h2>WEB DEVELOPER & SOFTWARE DEVELOPER/ENGINEER</h2>
+      <p class="tagline">
+        Creating immersive digital experiences through code and
+        astronomy-inspired design. Specializing in interactive 3D visualizations
+        and user-centered applications.
+      </p>
+       <div class="welcome-screen">
+
+       <button class="cta-button" id="explore-button">
+    Explore My Universe
+  </button>
+
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <p>Loading Universe...</p>
+  </div>
+
+
+       <!-- Stellar Soundscape Section -->
+  <section id="soundscape-section" class="soundscape-container">
+    <button id="exit-soundscape" class="exit-button">
+      <span class="exit-icon">×</span> Exit
+    </button>
+    <div id="planet-info" class="planet-info-panel">
+      <h3>Planet Information</h3>
+      <div id="planet-details">Click on a planet to learn more</div>
+    </div>
+    <canvas id="soundscape-canvas"></canvas>
+  </section>
+       <!-- Load libraries first -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/controls/OrbitControls.js"></script>
+      
+ <script>
+    
+      
+       
+     
+  </script>
+
+
+      <div class="nav-planets">
+        <div class="planet-container" data-section="about">
+          <div class="planet" id="about-planet"></div>
+          <div class="planet-label">ABOUT</div>
+        </div>
+        <div class="planet-container" data-section="projects">
+          <div class="planet" id="projects-planet"></div>
+          <div class="planet-label">PROJECTS</div>
+        </div>
+        <div class="planet-container" data-section="contact">
+          <div class="planet" id="contact-planet"></div>
+          <div class="planet-label">CONTACT</div>
+        </div>
+      </div>
+
+      <div class="scroll-indicator">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+        </svg>
+      </div>
+    </section>
+
+    <div class="social-links">
+      <a href="#" class="social-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path
+            d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+          />
+        </svg>
+      </a>
+      <a href="#" class="social-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path
+            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+          />
+        </svg>
+      </a>
+    </div>
+    <!-- About Section -->
+    <section id="about" class="about-section section-block">
+      <header class="section-header">
+        <h1 class="section-title">ABOUT ME</h1>
+        <p class="section-subtitle">
+          Meet the person behind the code - passionate about technology,
+          creativity, and the universe.
+        </p>
+      </header>
+
+      <div class="about-container">
+        <div class="about-content">
+          <div class="about-text">
+            <h2 class="about-heading">Hello, I'm Gabriela</h2>
+
+            <p class="about-description">
+              I'm a Computer Science student at Albright College with a minor in
+              Data Analytics, passionate about creating immersive digital
+              experiences that intertwine technology and art. My journey in tech
+              is driven by curiosity and a desire to build applications that are
+              both functional and aesthetically pleasing.
+            </p>
+            <p class="about-description">
+              My focus areas include interactive 3D visualizations, mobile app
+              development, and game development. I enjoy tackling complex
+              problems through code and turning abstract concepts into tangible
+              digital solutions.
+            </p>
+            <p class="about-description">
+              When I'm not coding, you can find me learning about astronomy and
+              psycology (human behavior) , capturing moments through
+              photography, or losing myself in music. These creative outlets
+              inspire my approach to development, bringing an artistic
+              perspective to my technical solutions.
+            </p>
+
+            <div class="interests-container">
+              <h3 class="interests-heading">What Drives Me</h3>
+              <div class="interests-grid">
+                <div class="interest-card">
+                  <div class="interest-icon astronomy-icon animated-icon">
+                    🔭
+                  </div>
+                  <h4 class="interest-title">Astronomy</h4>
+                  <p class="interest-desc">
+                    Stargazing and exploring space informs my space-themed
+                    designs.
+                  </p>
+                </div>
+
+                <div class="interest-card">
+                  <div class="interest-icon photography-icon animated-icon">
+                    📷
+                  </div>
+                  <h4 class="interest-title">Photography</h4>
+                  <p class="interest-desc">
+                    Capturing moments and perspectives that inspire my visual
+                    aesthetics.
+                  </p>
+                </div>
+
+                <div class="interest-card">
+                  <div class="interest-icon music-icon animated-icon">🎵</div>
+                  <h4 class="interest-title">Music</h4>
+                  <p class="interest-desc">
+                    Both listening and learning to play instruments fuels my
+                    creative process.
+                  </p>
+                  <ul class="favorites-list">
+                    <li>
+                      <strong>Albums:</strong> Un Verano Sin Ti – Bad Bunny,
+                      Blonde – Frank Ocean, Rumours – Fleetwood Mac
+                    </li>
+                    <li>
+                      <strong>Songs:</strong> “Forget her,” “Something,”
+                      “Landslide”
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="interest-card">
+                  <div class="interest-icon code-icon animated-icon">💻</div>
+                  <h4 class="interest-title">Coding</h4>
+                  <p class="interest-desc">
+                    Turning ideas into reality through elegant and efficient
+                    solutions.
+                  </p>
+                </div>
+
+                <div class="interest-card">
+                  <div class="interest-icon film-icon animated-icon">🎬</div>
+                  <h4 class="interest-title">Film & TV</h4>
+                  <p class="interest-desc">
+                    Analyzing visual storytelling, character arcs, and
+                    cinematography fuels how I design immersive user
+                    experiences.
+                  </p>
+                  <ul class="favorites-list">
+                    <li>
+                      <strong>Movies:</strong> A Real Pain, Everything
+                      Everywhere All At Once, Black Bear, Beautiful Boy
+                    </li>
+                    <li>
+                      <strong>TV Shows:</strong> Severance, Yellowjackets,
+                      Hacks, The Pitt, Fleabag
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="interest-card">
+                  <div class="interest-icon psych-icon animated-icon">🧠</div>
+                  <h4 class="interest-title">Psychology</h4>
+                  <p class="interest-desc">
+                    Understanding the mind and human behaviour enhances my
+                    ability to build intuitive, user-centered designs.
+                  </p>
+                </div>
+              </div>
+              <!-- End of .interests-grid -->
+            </div>
+            <!-- End of .interests-container -->
+          </div>
+          <div class="skills-container">
+            <h3 class="skills-heading">Technical Skills</h3>
+            <div class="skills-grid">
+              <div class="skill-category">
+                <h4 class="skill-category-title">Programming Languages</h4>
+                <div class="skill-tags">
+                  <span class="skill-tag">Python</span>
+                  <span class="skill-tag">Swift</span>
+                  <span class="skill-tag">R</span>
+                  <span class="skill-tag">Java</span>
+                  <span class="skill-tag">JavaScript</span>
+                  <span class="skill-tag">HTML</span>
+                  <span class="skill-tag">CSS</span>
+                </div>
+              </div>
+
+              <div class="skill-category">
+                <h4 class="skill-category-title">Frameworks</h4>
+                <div class="skill-tags">
+                  <span class="skill-tag">SwiftUI</span>
+                  <span class="skill-tag">R Shiny</span>
+                  <span class="skill-tag">Three.js</span>
+                  <span class="skill-tag">AVKit</span>
+                  <span class="skill-tag">CoreLocation</span>
+                  <span class="skill-tag">Pygame</span>
+                </div>
+              </div>
+
+              <div class="skill-category">
+                <h4 class="skill-category-title">Development Environments</h4>
+                <div class="skill-tags">
+                  <span class="skill-tag">Visual Studio Code</span>
+                  <span class="skill-tag">Glitch</span>
+                  <span class="skill-tag">R studio</span>
+                  <span class="skill-tag">Bluesky</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="resume" class="resume-section">
+      <header class="section-header">
+        <h1 class="section-title">MY JOURNEY</h1>
+        <p class="section-subtitle">
+          A timeline of my academic and professional milestones.
+        </p>
+      </header>
+
+      <div class="timeline">
+        <!-- EDUCATION -->
+        <div class="timeline-item">
+          <div class="timeline-dot">🎓</div>
+          <div class="timeline-content">
+            <h3>2022 – 2026 — Albright College</h3>
+            <p>
+              <strong>B.S. Computer Science, Minor: Data Analytics</strong
+              ><br />
+              GPA: 3.722 | Dean's List: Fall 2022, Spring 2023, Spring 2024<br />
+            </p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot">📊</div>
+          <div class="timeline-content">
+            <h3>
+              2023 — Data project comparing televisions shows and movies (R
+              Shiny)
+            </h3>
+            <p>
+              Developed a website that allows for the explore of data in a
+              variety of ways, including comparing ratings across IMDb, Rotten
+              Tomatoes, and Metacritic, looking at box office performance,
+              evaluating how runtime influences ratings, and seeing how ratings
+              change over time. It additionally, includes statistics
+              specifically genre statistics, compared with the previous years
+              and trends, and rating distributions. Lastly it includes
+              interactive visualizations.
+            </p>
+          </div>
+        </div>
+        <div class="timeline-item">
+  <div class="timeline-dot">🎵</div>
+  <div class="timeline-content">
+    <h3>2024 — Data Analytics Project: Economic Recessions & Music Trends</h3>
+    <p>
+      Investigated correlations between U.S. economic downturns (2000–2023) and popular music characteristics using Billboard Hot 100 and Spotify datasets (3,397 songs).<br />
+      Extracted and analyzed audio features (valence, energy, danceability) and lyrical sentiment using Python and statistical tools.<br />
+      Integrated macroeconomic data from FRED (GDP, unemployment, consumer confidence) to identify patterns in music during recession vs. non-recession periods.<br />
+      Found weak but suggestive links: during recessions, music showed slightly more positive sentiment and a shift toward upbeat genres like dance/pop.<br />
+      Visualized trends over time with regression models, sentiment density plots, and genre distribution charts; observed notable genre shifts and emotional responses around economic transitions.<br />
+      Demonstrated music’s potential role as both cultural reflection and emotional escape during economic hardship.
+    </p>
+    <a href="https://cdn.glitch.global/7db54938-5509-4084-8349-d3d37e5ae310/The%20Relationship%20Between%20Economic%20Recessions%20and%20Music%20Trends%20(1).docx?v=1745433765808" target="_blank" class="btn">View Paper</a>
+  </div>
+</div>
+
+      </div>
+
+      <div class="resume-download">
+        <a
+          href="https://cdn.glitch.global/7db54938-5509-4084-8349-d3d37e5ae310/Resume___Gabriela_Rubio%20(4).pdf?v=1745433564475"
+          download
+          class="download-btn"
+          >📄 RESUME
+        </a>
+      </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="projects-section">
+      <header class="section-header">
+        <h1 class="section-title">STELLAR CREATIONS</h1>
+        <p class="section-subtitle">
+          Explore a universe of my most significant projects, from immersive 3D
+          visualizations to functional applications that showcase my programming
+          expertise.
+        </p>
+      </header>
+
+      <div class="projects-container">
+        <div class="featured-project">
+          <div class="featured-project-content">
+            <div class="featured-project-info">
+              <p class="featured-project-label">FEATURED PROJECT</p>
+              <h2 class="featured-project-title">Solar System Explorer</h2>
+              <p class="featured-project-description">
+                An interactive 3D visualization of our solar system with
+                accurate planetary models and orbital mechanics. Users can
+                explore planets up close, learn astronomical facts, and observe
+                realistic space phenomena like light scattering and atmospheric
+                effects.
+              </p>
+
+              <div class="tech-list">
+                <span class="tech-tag">HTML5</span>
+                <span class="tech-tag">CSS3</span>
+                <span class="tech-tag">JavaScript</span>
+                <span class="tech-tag">Three.js</span>
+                <span class="tech-tag">WebGL</span>
+              </div>
+
+              <div class="project-links">
+                <a
+                  href="https://github.com/Gabriela0727/Solar-System-Explorer"
+                  class="project-link"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+                    />
+                  </svg>
+                  GitHub Repository
+                </a>
+                <a
+                  href="https://github.com/Gabriela0727/Solar-System-Explorer"
+                  class="project-link"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"
+                    />
+                  </svg>
+                  Live Demo
+                </a>
+              </div>
+            </div>
+
+            <div class="featured-project-visual">
+              <div id="solar-system-demo"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-grid">
+          <div class="project-card">
+            <div class="project-image alien-game">👾</div>
+            <div class="project-info">
+              <h3 class="project-title">Alien Invasion Game</h3>
+              <p class="project-description">
+                An arcade-style game developed with object-oriented programming
+                principles, featuring dynamic difficulty scaling and progressive
+                level advancement.
+              </p>
+              <div class="project-tech">
+                <span class="project-tech-tag">Python</span>
+                <span class="project-tech-tag">Pygame</span>
+                <span class="project-tech-tag">OOP</span>
+              </div>
+              <a
+                href="https://github.com/Gabriela0727/Alien-invension-"
+                class="view-project-btn"
+                >View Project</a
+              >
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="project-image meditation-app">
+              <img
+                src="https://cdn.glitch.global/7db54938-5509-4084-8349-d3d37e5ae310/Screenshot%202025-04-16%20at%206.25.36%E2%80%AFPM.png?v=1744854190398"
+                alt="Meditation App Screenshot"
+              />
+            </div>
+            <div class="project-info">
+              <h3 class="project-title">Meditation App</h3>
+              <p class="project-description">
+                A native iOS meditation application using SwiftUI and MVVM
+                architecture with comprehensive audio playback features and
+                custom UI components.
+              </p>
+              <div class="project-tech">
+                <span class="project-tech-tag">Swift</span>
+                <span class="project-tech-tag">SwiftUI</span>
+                <span class="project-tech-tag">AVKit</span>
+                <span class="project-tech-tag">MVVM</span>
+              </div>
+              <a
+                href="https://github.com/Gabriela0727/Meditation-app"
+                class="view-project-btn"
+                >View Project</a
+              >
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="project-image weather-app">
+              <img
+                src="https://cdn.glitch.global/7db54938-5509-4084-8349-d3d37e5ae310/Screenshot%202025-04-16%20at%206.22.21%E2%80%AFPM.png?v=1744901066545"
+                alt=">Weather App Screenshot"
+              />
+            </div>
+            <div class="project-info">
+              <h3 class="project-title">Weather Application</h3>
+              <p class="project-description">
+                A location-based weather app integrating the OpenWeatherMap API
+                for real-time data and forecasts with CoreLocation services.
+              </p>
+              <div class="project-tech">
+                <span class="project-tech-tag">Swift</span>
+                <span class="project-tech-tag">SwiftUI</span>
+                <span class="project-tech-tag">CoreLocation</span>
+                <span class="project-tech-tag">REST API</span>
+              </div>
+              <a
+                href="https://github.com/Gabriela0727/Weather-app-"
+                class="view-project-btn"
+                >View Project</a
+              >
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="project-image imdb-explorer">
+              <img
+                src="https://cdn.glitch.global/7db54938-5509-4084-8349-d3d37e5ae310/Screenshot%202025-04-17%20at%208.12.27%E2%80%AFPM.png?v=1744935284794"
+                alt="IMDb Explorer Screenshot"
+              />
+            </div>
+            <div class="project-info">
+              <h3 class="project-title">IMDb Explorer</h3>
+              <p class="project-description">
+                An interactive data visualization application for exploring TV
+                shows and movies, featuring filtering and dynamic visualization
+                capabilities.
+              </p>
+              <div class="project-tech">
+                <span class="project-tech-tag">R</span>
+                <span class="project-tech-tag">R Shiny</span>
+                <span class="project-tech-tag">Data Visualization</span>
+              </div>
+              <a
+                href="https://github.com/Gabriela0727/IMDb-TV-shows-and-movie-explorer"
+                class="view-project-btn"
+                >View Project</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        // Initialize Three.js scene for background
+        const container = document.getElementById("canvas-container");
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(
+          75,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          1000
+        );
+        const renderer = new THREE.WebGLRenderer({
+          antialias: true,
+          alpha: true,
+        });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        // Create stars
+        const starsGeometry = new THREE.BufferGeometry();
+        const starsMaterial = new THREE.PointsMaterial({
+          color: 0xffffff,
+          size: 0.6,
+          transparent: true,
+        });
+
+        const starsVertices = [];
+        for (let i = 0; i < 15000; i++) {
+          const x = (Math.random() - 0.5) * 2000;
+          const y = (Math.random() - 0.5) * 2000;
+          const z = -Math.random() * 2000;
+          starsVertices.push(x, y, z);
+        }
+
+        starsGeometry.setAttribute(
+          "position",
+          new THREE.Float32BufferAttribute(starsVertices, 3)
+        );
+        const stars = new THREE.Points(starsGeometry, starsMaterial);
+        scene.add(stars);
+
+        // Create distant galaxy
+        function createGalaxy(x, y, z, color, size) {
+          const galaxyGeometry = new THREE.BufferGeometry();
+          const galaxyMaterial = new THREE.PointsMaterial({
+            color: color,
+            size: size,
+            transparent: true,
+            opacity: 0.7,
+          });
+
+          const galaxyVertices = [];
+          const galaxyRadius = 30 + Math.random() * 20;
+          const galaxyParticles = 500 + Math.random() * 500;
+
+          for (let i = 0; i < galaxyParticles; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = Math.random() * galaxyRadius;
+
+            const gx = Math.cos(angle) * radius;
+            const gy = (Math.random() - 0.5) * 5;
+            const gz = Math.sin(angle) * radius;
+
+            galaxyVertices.push(gx, gy, gz);
+          }
+
+          galaxyGeometry.setAttribute(
+            "position",
+            new THREE.Float32BufferAttribute(galaxyVertices, 3)
+          );
+          const galaxy = new THREE.Points(galaxyGeometry, galaxyMaterial);
+          galaxy.position.set(x, y, z);
+          scene.add(galaxy);
+
+          return galaxy;
+        }
+
+        const galaxies = [];
+        galaxies.push(createGalaxy(-200, 100, -500, 0x8a9ccb, 0.8));
+        galaxies.push(createGalaxy(300, -150, -600, 0xff8a65, 0.7));
+
+        // Position camera
+        camera.position.z = 5;
+
+        // Handle window resize
+        window.addEventListener("resize", () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Animation loop for background
+        function animateBackground() {
+          requestAnimationFrame(animateBackground);
+
+          // Animate stars
+          stars.rotation.x += 0.0001;
+          stars.rotation.y += 0.0002;
+
+          // Animate galaxies
+          galaxies.forEach((galaxy, i) => {
+            galaxy.rotation.z += 0.0003 * (i + 1);
+          });
+
+          renderer.render(scene, camera);
+        }
+
+        animateBackground();
+
+        // Solar System Demo
+        const solarSystemContainer =
+          document.getElementById("solar-system-demo");
+        const solarScene = new THREE.Scene();
+        const solarCamera = new THREE.PerspectiveCamera(
+          75,
+          solarSystemContainer.clientWidth / solarSystemContainer.clientHeight,
+          0.1,
+          1000
+        );
+        const solarRenderer = new THREE.WebGLRenderer({ antialias: true });
+
+        solarRenderer.setSize(
+          solarSystemContainer.clientWidth,
+          solarSystemContainer.clientHeight
+        );
+        solarSystemContainer.appendChild(solarRenderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0x333333);
+        solarScene.add(ambientLight);
+
+        const sunLight = new THREE.PointLight(0xffffff, 1.5);
+        solarScene.add(sunLight);
+
+        // Create Sun
+        const sunGeometry = new THREE.SphereGeometry(10, 32, 32);
+        const sunMaterial = new THREE.MeshBasicMaterial({
+          color: 0xffcc00,
+          transparent: true,
+          opacity: 0.9,
+        });
+        const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+        solarScene.add(sun);
+
+        // Create sun glow
+        const sunGlowGeometry = new THREE.SphereGeometry(10.5, 32, 32);
+        const sunGlowMaterial = new THREE.MeshBasicMaterial({
+          color: 0xffcc00,
+          transparent: true,
+          opacity: 0.5,
+        });
+        const sunGlow = new THREE.Mesh(sunGlowGeometry, sunGlowMaterial);
+        solarScene.add(sunGlow);
+
+        // Create planets
+        function createPlanet(size, color, distance, speed) {
+          // Planet
+          const planetGeometry = new THREE.SphereGeometry(size, 32, 32);
+          const planetMaterial = new THREE.MeshStandardMaterial({
+            color: color,
+            roughness: 0.8,
+            metalness: 0.1,
+          });
+          const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+          planet.userData = {
+            distance,
+            speed,
+            angle: Math.random() * Math.PI * 2,
+          };
+
+          // Orbit
+          const orbitGeometry = new THREE.RingGeometry(
+            distance - 0.1,
+            distance + 0.1,
+            128
+          );
+          const orbitMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.1,
+            side: THREE.DoubleSide,
+          });
+          const orbit = new THREE.Mesh(orbitGeometry, orbitMaterial);
+          orbit.rotation.x = Math.PI / 2;
+
+          solarScene.add(planet);
+          solarScene.add(orbit);
+
+          return planet;
+        }
+
+        const planets = [
+          createPlanet(1.2, 0x3498db, 20, 0.02), // Mercury
+          createPlanet(2.0, 0xe67e22, 30, 0.015), // Venus
+          createPlanet(2.2, 0x2ecc71, 40, 0.01), // Earth
+          createPlanet(1.5, 0xe74c3c, 50, 0.008), // Mars
+          createPlanet(4.0, 0xf1c40f, 65, 0.005), // Jupiter
+          createPlanet(3.5, 0xf39c12, 80, 0.003), // Saturn
+          createPlanet(3.0, 0x1abc9c, 95, 0.002), // Uranus
+          createPlanet(2.8, 0x3498db, 110, 0.0015), // Neptune
+        ];
+
+        // Create starfield for solar system view
+        const solarStarsGeometry = new THREE.BufferGeometry();
+        const solarStarsMaterial = new THREE.PointsMaterial({
+          color: 0xffffff,
+          size: 0.5,
+        });
+
+        const solarStarsVertices = [];
+        for (let i = 0; i < 2000; i++) {
+          const x = (Math.random() - 0.5) * 500;
+          const y = (Math.random() - 0.5) * 500;
+          const z = (Math.random() - 0.5) * 500;
+
+          // Ensure stars are not too close to the solar system
+          const distance = Math.sqrt(x * x + y * y + z * z);
+          if (distance > 120) {
+            solarStarsVertices.push(x, y, z);
+          }
+        }
+
+        solarStarsGeometry.setAttribute(
+          "position",
+          new THREE.Float32BufferAttribute(solarStarsVertices, 3)
+        );
+        const solarStars = new THREE.Points(
+          solarStarsGeometry,
+          solarStarsMaterial
+        );
+        solarScene.add(solarStars);
+
+        // Set camera position
+        solarCamera.position.set(0, 50, 100);
+        solarCamera.lookAt(0, 0, 0);
+
+        // Handle resize
+        window.addEventListener("resize", () => {
+          solarCamera.aspect =
+            solarSystemContainer.clientWidth /
+            solarSystemContainer.clientHeight;
+          solarCamera.updateProjectionMatrix();
+          solarRenderer.setSize(
+            solarSystemContainer.clientWidth,
+            solarSystemContainer.clientHeight
+          );
+        });
+
+        // Animate solar system
+        function animateSolarSystem() {
+          requestAnimationFrame(animateSolarSystem);
+
+          // Rotate sun
+          sun.rotation.y += 0.002;
+          sunGlow.rotation.y -= 0.001;
+
+          // Update planet positions
+          planets.forEach((planet) => {
+            planet.userData.angle += planet.userData.speed;
+
+            const x =
+              Math.cos(planet.userData.angle) * planet.userData.distance;
+            const z =
+              Math.sin(planet.userData.angle) * planet.userData.distance;
+
+            planet.position.set(x, 0, z);
+            planet.rotation.y += 0.01;
+          });
+
+          // Slowly rotate solar system view
+          solarScene.rotation.y += 0.001;
+
+          solarRenderer.render(solarScene, solarCamera);
+        }
+
+        animateSolarSystem();
+
+        document.querySelectorAll(".planet-container").forEach((planet) => {
+          planet.addEventListener("click", () => {
+            const sectionId = planet.getAttribute("data-section");
+            const section = document.getElementById(sectionId);
+            if (section) {
+              section.scrollIntoView({ behavior: "smooth" });
+            }
+          });
+        });
+        const planetsWithSound = document.querySelectorAll(".planet-container");
+        const spacePing = document.getElementById("space-ping");
+
+        planetsWithSound.forEach((planet) => {
+          planet.addEventListener("click", () => {
+            const sectionId = planet.getAttribute("data-section");
+            const section = document.getElementById(sectionId);
+            if (section) {
+              section.scrollIntoView({ behavior: "smooth" });
+            }
+
+            const planetEl = planet.querySelector(".planet");
+            planetEl.classList.add("clicked");
+            setTimeout(() => {
+              planetEl.classList.remove("clicked");
+            }, 400);
+
+            // Play sound
+            spacePing.pause();
+            spacePing.currentTime = 0;
+            spacePing.play().catch((e) => console.log("Sound blocked:", e));
+          });
+        });
+        document
+          .getElementById("explore-button")
+          .addEventListener("click", () => {
+            const section = document.getElementById("interests");
+            section.scrollIntoView({ behavior: "smooth" });
+          });
+
+        window.addEventListener("load", () => {
+          const loader = document.getElementById("loading-screen");
+          loader.style.display = "none";
+        });
+        document
+          .querySelector(".scroll-indicator")
+          .addEventListener("click", () => {
+            const nextSection = document.getElementById("about"); // scrolls to About
+            if (nextSection) {
+              nextSection.scrollIntoView({ behavior: "smooth" });
+            }
+          });
+
+        const timelineItems = document.querySelectorAll(".timeline-item");
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          {
+            threshold: 0.2,
+          }
+        );
+
+        timelineItems.forEach((item) => observer.observe(item));
+      </script>
+      <script>
+  document.getElementById("explore-button").addEventListener("click", () => {
+    window.location.href = "solar-system.html"; // Redirect to the solar system page
+  });
+</script>
+
+      <!-- Contact Section -->
+      <section id="contact" class="contact-section">
+        <header class="section-header">
+          <h1 class="section-title">GET IN TOUCH</h1>
+          <p class="section-subtitle">
+            Interested in working together? Let's connect and create something
+            amazing.
+          </p>
+        </header>
+
+        <div class="contact-container">
+          <div class="contact-content">
+            <div class="contact-info">
+              <h2 class="contact-heading">Let's Collaborate</h2>
+              <p class="contact-description">
+              <div class="contact-details">
+                <div class="contact-method">
+                  <div class="contact-icon">📧</div>
+                  <div class="contact-text">
+                    <h3>Email</h3>
+                    <p>
+                      <a href="mailto:gabrielar2927@gmail.com"
+                        >gabrielar2927@gmail.com</a
+                      >
+                    </p>
+                  </div>
+                </div>
+
+                <div class="contact-method">
+                  <div class="contact-icon">🔗</div>
+                  <div class="contact-text">
+                    <h3>LinkedIn</h3>
+                    <p>
+                      <a
+                        href="https://www.linkedin.com/in/gabriela-rubio-5a8169255/"
+                        target="_blank"
+                        >Connect with me</a
+                      >
+                    </p>
+                  </div>
+                </div>
+
+                <div class="contact-method">
+                  <div class="contact-icon">💻</div>
+                  <div class="contact-text">
+                    <h3>GitHub</h3>
+                    <p>
+                      <a href="https://github.com/Gabriela0727" target="_blank"
+                        >Check out my code</a
+                      >
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="contact-form-container">
+              <h2 class="form-heading">Send Me a Message</h2>
+              <form class="contact-form" id="contact-form">
+                <div class="form-group">
+                  <label for="name">Name</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="Your name"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Your email"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="subject">Subject</label>
+                  <input
+                    type="text"
+                    id="subject"
+                    name="subject"
+                    placeholder="Subject"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="message">Message</label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    placeholder="Your message"
+                    rows="5"
+                    required
+                  ></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Send Message</button>
+              </form>
+            </div>
+          </div>
+        </div> 
+      </section>
+      <audio id="space-ping" preload="auto">
+        <source
+          src="https://cdn.glitch.global/7db54938-5509-4084-8349-d3d37e5ae310/786460__cvltiv8r__synth-pad-pretty-smooth-4.wav?v=1745424888525"
+          type="audio/mpeg"
+        />
+      </audio>
+      <div
+        id="interest-universe-container"
+        style="width: 100%; height: 100vh; display: none"
+      ></div>
+      :
+      <!--
+<div class="availability-badge"> ✅ Available for Projects</div>  -->
+      <div class="availability-badge">⛔ Unavailable for Projects</div>
+    </section>
+  </body>
+</html>
